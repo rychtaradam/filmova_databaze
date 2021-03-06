@@ -3,6 +3,10 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
 
 
+def attachment_path(instance, filename):
+    return "film/" + str(instance.film.id) + "/attachments/" + filename
+
+
 class Genre(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Genre name",
                             help_text='Enter a film genre (e.g. sci-fi, comedy)')
@@ -37,3 +41,27 @@ class Film(models.Model):
 
     def get_absolute_url(self):
         return reverse('film-detail', args=[str(self.id)])
+
+
+class Attachment(models.Model):
+    title = models.CharField(max_length=200, verbose_name="Title")
+    last_update = models.DateTimeField(auto_now=True)
+    file = models.FileField(upload_to=attachment_path, null=True, verbose_name="File")
+
+    TYPE_OF_ATTACHMENT = (
+        ('audio', 'Audio'),
+        ('image', 'Image'),
+        ('text', 'Text'),
+        ('video', 'Video'),
+        ('other', 'Other'),
+    )
+
+    type = models.CharField(max_length=5, choices=TYPE_OF_ATTACHMENT, blank=True, default='image',
+                            help_text='Select allowed attachment type', verbose_name="Attachment type")
+    film = models.ForeignKey(Film, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ["-last_update", "type"]
+
+    def __str__(self):
+        return f"{self.title}, ({self.type})"
