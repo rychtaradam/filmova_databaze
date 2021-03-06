@@ -7,6 +7,10 @@ def attachment_path(instance, filename):
     return "film/" + str(instance.film.id) + "/attachments/" + filename
 
 
+def poster_path(instance, filename):
+    return "film/" + str(instance.id) + "/poster/" + filename
+
+
 class Genre(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Genre name",
                             help_text='Enter a film genre (e.g. sci-fi, comedy)')
@@ -31,6 +35,7 @@ class Film(models.Model):
                              null=True,
                              help_text="Please enter an float value (range 1.0 - 10.0)",
                              verbose_name="Rate")
+    poster = models.ImageField(upload_to=poster_path, blank=True, null=True, verbose_name="Poster")
     genres = models.ManyToManyField(Genre, help_text='Select a genre for this film')
 
     class Meta:
